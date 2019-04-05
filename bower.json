@@ -13,7 +13,8 @@
     "purescript-node-fs-aff": "^6.0.0",
     "purescript-aff": "^5.1.1",
     "purescript-generics-rep": "^6.1.1",
-    "purescript-foreign-generic": "^9.0.0"
+    "purescript-foreign-generic": "^9.0.0",
+    "purescript-milkis": "^7.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"
