@@ -10,7 +10,7 @@ import Data.Map (Map)
 import Data.Maybe (Maybe)
 import Data.Traversable (traverse)
 import Effect (Effect)
-import Effect.Aff (Aff, attempt, launchAff)
+import Effect.Aff (Aff, attempt, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (logShow)
 import ElmJson (ElmJson(ElmJson), Dependencies(Dependencies), DependencyMap(DependencyMap))
@@ -23,8 +23,8 @@ import SearchJson (SearchJson)
 import Version (Version)
 
 main :: Effect Unit
-main = do
-    _ <- launchAff do
+main =
+    launchAff_ do
         -- _ <- fetchSearch
 
         content <- readTextFile UTF8 "./assets/elm.json"
@@ -32,7 +32,6 @@ main = do
         liftEffect $ logShow $ fold $ concatDependencies
             <$> runExcept (genericDecodeJSON defaultOptions { unwrapSingleConstructors = true } content :: _ ElmJson)
 
-    pure unit
     where
         fetchSearch :: Aff (Either Unit SearchJson)
         fetchSearch =

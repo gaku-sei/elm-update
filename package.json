@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "pulp run",
-    "build": "pulp build"
+    "build": "pulp build",
+    "test": "pulp test"
   },
   "devDependencies": {
     "pulp": "^12.3.1",

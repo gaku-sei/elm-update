@@ -1,9 +1,13 @@
 module Test.Main where
 
 import Prelude
+
 import Effect (Effect)
-import Effect.Console (log)
+import Test.Spec.Reporter (consoleReporter)
+import Test.Spec.Runner (run)
+import Test.Version as Version
 
 main :: Effect Unit
-main = do
-  log "You should add some tests."
+main =
+    run [consoleReporter] do
+        Version.tests

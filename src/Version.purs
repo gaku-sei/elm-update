@@ -1,4 +1,4 @@
-module Version (Version) where
+module Version (Version(..)) where
 
 import Prelude
 
@@ -54,3 +54,22 @@ instance showVersion :: Show Version where
 instance readVersion :: Read Version where
     read =
         hush <<< flip runParser versionParser
+
+derive instance eqVersion :: Eq Version
+
+-- Since the `Ord` generic derivation is based on the alphabetical order,
+-- it means that renaming patch, to let's say, bugfixes, will completely
+-- change the ordering of Version. Hence, the manual instance.
+instance ordVersion :: Ord Version where
+    compare (Version { major }) (Version { major: major' })
+        | major > major' = GT
+        | major < major' = LT
+    compare (Version { minor }) (Version { minor: minor' })
+        | minor > minor' = GT
+        | minor < minor' = LT
+    compare (Version { patch }) (Version { patch: patch' })
+        | patch > patch' = GT
+        | patch < patch' = LT
+    compare (Version { major, minor, patch }) (Version { major: major', minor: minor', patch: patch' })
+        | major == major' && minor == minor' && patch == patch' = EQ
+    compare _ _ = LT
