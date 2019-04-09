@@ -14,10 +14,11 @@
   "scripts": {
     "start": "pulp run",
     "build": "pulp build",
-    "test": "pulp test"
+    "test": "pulp test",
+    "postinstall": "bower install"
   },
   "devDependencies": {
-    "pulp": "^12.3.1",
+    "pulp": "^12.4.0",
     "yarn": "^1.15.2"
   }
 }
