@@ -4,10 +4,10 @@ import Prelude
 
 import Control.Monad.Except (runExcept)
 import Data.Bifunctor (lmap)
-import Data.Either (Either)
+import Data.Either (Either(..))
 import Data.Foldable (fold)
 import Data.Map (Map)
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Aff (Aff, attempt, launchAff_)
@@ -19,20 +19,28 @@ import Milkis (URL(..), defaultFetchOptions, fetch, text)
 import Milkis.Impl.Node (nodeFetch)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Aff (readTextFile)
+import Node.Yargs.Applicative (Y, runY, yarg)
+import Node.Yargs.Setup (defaultHelp)
 import SearchJson (SearchJson)
 import Version (Version)
 
 main :: Effect Unit
-main =
-    launchAff_ do
-        -- _ <- fetchSearch
-
-        content <- readTextFile UTF8 "./assets/elm.json"
-
-        liftEffect $ logShow $ fold $ concatDependencies
-            <$> runExcept (genericDecodeJSON defaultOptions { unwrapSingleConstructors = true } content :: _ ElmJson)
-
+main = runY defaultHelp $ app <$> projectPathArgument
     where
+        app :: String -> Effect Unit
+        app projectPath =
+            launchAff_ do
+                -- _ <- fetchSearch
+
+                content <- readTextFile UTF8 projectPath
+
+                liftEffect $ logShow $ fold $ concatDependencies
+                    <$> runExcept (genericDecodeJSON defaultOptions { unwrapSingleConstructors = true } content :: _ ElmJson)
+
+        projectPathArgument :: Y String
+        projectPathArgument =
+            yarg "project" ["p"] (Just "elm.json path") (Left "./elm.json") true
+
         fetchSearch :: Aff (Either Unit SearchJson)
         fetchSearch =
             (attempt $ (fetch nodeFetch) (URL "https://package.elm-lang.org/search.json") defaultFetchOptions)

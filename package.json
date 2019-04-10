@@ -9,7 +9,8 @@
   "author": "Kevin COMBRIAT <kevin@sc0ville.com>",
   "license": "MIT",
   "dependencies": {
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^2.3.0",
+    "yargs": "^13.2.2"
   },
   "scripts": {
     "start": "pulp run",
