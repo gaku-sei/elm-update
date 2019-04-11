@@ -18,6 +18,8 @@ newtype DependencyMap = DependencyMap (Map String (Maybe Version))
 
 derive instance repGenericObject :: Generic DependencyMap _
 
+derive newtype instance showDependencyMap :: Show DependencyMap
+
 instance decodeObject :: Decode DependencyMap where
     decode value =
         readObject value
@@ -27,10 +29,11 @@ instance decodeObject :: Decode DependencyMap where
 
 newtype Dependencies = Dependencies
     { direct :: DependencyMap
-    , indirect :: DependencyMap
     }
 
 derive instance repGenericDependencies :: Generic Dependencies _
+
+derive newtype instance showDependencies :: Show Dependencies
 
 instance decodeDependencies :: Decode Dependencies where
     decode =
@@ -41,6 +44,8 @@ newtype ElmJson = ElmJson
     }
 
 derive instance repGenericElmJson :: Generic ElmJson _
+
+derive newtype instance showElmJson :: Show ElmJson
 
 instance decodeElmJson :: Decode ElmJson where
     decode =
