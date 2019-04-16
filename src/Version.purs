@@ -46,7 +46,6 @@ instance decodeVersion :: Decode Version where
                 <<< lmap (NonEmptyList <<< flip (:|) mempty <<< ForeignError <<< parseErrorMessage)
                 <<< flip runParser versionParser)
 
-
 instance showVersion :: Show Version where
     show (Version { major, minor, patch }) =
         (show major) <> "." <> (show minor) <> "." <> (show patch)

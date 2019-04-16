@@ -1,9 +1,9 @@
 {
-  "name": "elm-upgrade",
+  "name": "elm-update",
   "version": "0.1.0",
   "main": "index.js",
   "bin": {
-    "elm-upgrade": "./bin/index.js"
+    "elm-update": "./bin/index.js"
   },
   "repository": "git@github.com:gaku-sei/elm-upgrade.git",
   "author": "Kevin COMBRIAT <kevin@sc0ville.com>",
