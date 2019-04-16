@@ -3,12 +3,12 @@ module Main where
 import Prelude
 
 import Control.Monad.Except (runExcept)
-import Data.Array (any, filter)
+import Data.Array (filter, null)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), either)
 import Data.Foldable (fold)
 import Data.FunctorWithIndex (mapWithIndex)
-import Data.Map (Map, fromFoldable)
+import Data.Map (Map, filterWithKey, fromFoldable)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Traversable (traverse)
@@ -26,6 +26,7 @@ import Node.Encoding (Encoding(UTF8))
 import Node.FS.Aff (readTextFile)
 import Node.Yargs.Applicative (Y, runY, yarg)
 import Node.Yargs.Setup (defaultHelp)
+import Packages (Packages(..))
 import SearchJson (Entry, SearchJson)
 import Version (Version)
 
@@ -35,21 +36,27 @@ main = runY defaultHelp $ app <$> projectPathArgument
         app :: String -> Effect Unit
         app projectPath =
             launchAff_ do
-                jsonSearch <- fetchSearch <#> unwrap
-                dependencies <- getDepencencies projectPath
+                jsonSearch <- unwrap <$> fetchSearch
+                getDepencencies projectPath
+                    >>= (liftEffect
+                        <<< logShow
+                        <<< Packages
+                        <<< filterWithKey (const $ not <<< null)
+                        <<< fromFoldable
+                        <<< mapWithIndex (findLaterVersions jsonSearch))
 
-                liftEffect $ logShow $ fromFoldable $ findUpper jsonSearch `mapWithIndex` dependencies
+        findLaterVersions :: Array Entry -> String -> (Maybe Version) -> Tuple String (Array Version)
+        findLaterVersions entries k v =
+            Tuple k $ filter later allVersions
+            where
+                later :: Version -> Boolean
+                later = Just >>> (<) v
 
-                -- liftEffect $ logShow jsonSearch
-
-                -- liftEffect $ logShow dependencies
-
-        findUpper :: Array Entry -> String -> (Maybe Version) -> Tuple String Boolean
-        findUpper entries k v =
-            Tuple k $ (Just >>> (>) v) `any` (
-                case filter (unwrap >>> _.name >>> (==) k) entries of
+                allVersions :: Array Version
+                allVersions =
+                    case filter (unwrap >>> _.name >>> (==) k) entries of
                         [m] -> unwrap m # _.versions
-                        _ -> [])
+                        _ -> []
 
         projectPathArgument :: Y String
         projectPathArgument =
