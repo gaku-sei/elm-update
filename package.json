@@ -16,7 +16,7 @@
     "start": "pulp run",
     "build": "pulp build",
     "test": "pulp test",
-    "postinstall": "bower install"
+    "postinstall": "bower install && pulp build"
   },
   "devDependencies": {
     "pulp": "^12.4.0",
