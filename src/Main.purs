@@ -18,7 +18,6 @@ import Effect.Aff (Aff, attempt, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (logShow)
 import Effect.Exception (throw)
-import ElmJson (ElmJson(ElmJson), Dependencies(Dependencies), DependencyMap(DependencyMap))
 import Foreign.Generic (defaultOptions, genericDecodeJSON)
 import Milkis (URL(..), defaultFetchOptions, fetch, text)
 import Milkis.Impl.Node (nodeFetch)
@@ -26,9 +25,15 @@ import Node.Encoding (Encoding(UTF8))
 import Node.FS.Aff (readTextFile)
 import Node.Yargs.Applicative (Y, runY, yarg)
 import Node.Yargs.Setup (defaultHelp)
-import Packages (Packages(..))
-import SearchJson (Entry, SearchJson)
-import Version (Version)
+import Types
+    ( Dependencies(Dependencies)
+    , DependencyMap(DependencyMap)
+    , Entry
+    , ElmJson(ElmJson)
+    , Packages(Packages)
+    , SearchJson
+    , Version
+    )
 
 main :: Effect Unit
 main = runY defaultHelp $ app <$> projectPathArgument
