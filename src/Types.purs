@@ -5,7 +5,7 @@ module Types
     , ElmJson(ElmJson)
     , Packages(Packages)
     , SearchJson
-    , Version
+    , Version(Version)
     ) where
 
 import Prelude
@@ -89,7 +89,8 @@ instance ordVersion :: Ord Version where
         | patch < patch' = LT
     compare (Version { major, minor, patch }) (Version { major: major', minor: minor', patch: patch' })
         | major == major' && minor == minor' && patch == patch' = EQ
-    compare _ _ = LT
+    -- This one should not even be reachable
+    compare _ _ = EQ
 
 
 -- The elm.json dependencies and their version parsed
