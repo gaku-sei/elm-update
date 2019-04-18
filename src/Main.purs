@@ -8,7 +8,7 @@ import Data.Bifunctor (lmap)
 import Data.Either (Either(..), either)
 import Data.Foldable (fold)
 import Data.FunctorWithIndex (mapWithIndex)
-import Data.Map (Map, filterWithKey, fromFoldable)
+import Data.Map (Map, filterWithKey, fromFoldable, isEmpty)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Traversable (traverse)
@@ -16,6 +16,7 @@ import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Aff (Aff, attempt, launchAff_)
 import Effect.Class (liftEffect)
+import Effect.Class.Console (log)
 import Effect.Console (logShow)
 import Effect.Exception (throw)
 import Foreign.Generic (defaultOptions, genericDecodeJSON)
@@ -25,15 +26,7 @@ import Node.Encoding (Encoding(UTF8))
 import Node.FS.Aff (readTextFile)
 import Node.Yargs.Applicative (Y, runY, yarg)
 import Node.Yargs.Setup (defaultHelp)
-import Types
-    ( Dependencies(Dependencies)
-    , DependencyMap(DependencyMap)
-    , Entry
-    , ElmJson(ElmJson)
-    , NewerDependencyMap(NewerDependencyMap)
-    , SearchJson
-    , Version
-    )
+import Types (Dependencies(Dependencies), DependencyMap(DependencyMap), Entry, ElmJson(ElmJson), NewerDependencyMap(NewerDependencyMap), SearchJson, Version)
 
 main :: Effect Unit
 main = runY defaultHelp $ app <$> projectPathArgument
@@ -41,14 +34,23 @@ main = runY defaultHelp $ app <$> projectPathArgument
         app :: String -> Effect Unit
         app projectPath =
             launchAff_ do
+                liftEffect $ log "Fetching latest dependencies versions..."
+
                 jsonSearch <- unwrap <$> fetchSearch
+
                 getDepencencies projectPath
-                    >>= (liftEffect
-                        <<< logShow
-                        <<< NewerDependencyMap
-                        <<< filterWithKey (const $ not <<< null)
-                        <<< fromFoldable
-                        <<< mapWithIndex (findLaterVersions jsonSearch))
+                    >>= (mapWithIndex (findLaterVersions jsonSearch)
+                        >>> fromFoldable
+                        >>> filterWithKey (const $ not <<< null)
+                        >>> logNewerDependencyMap
+                        >>> liftEffect)
+
+        logNewerDependencyMap :: Map String (Array Version) -> Effect Unit
+        logNewerDependencyMap m =
+            if isEmpty m then
+                log "Your dependencies are all up to date"
+            else
+                logShow $ NewerDependencyMap m
 
         findLaterVersions :: Array Entry -> String -> (Maybe Version) -> Tuple String (Array Version)
         findLaterVersions entries k v =

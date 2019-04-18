@@ -11,17 +11,18 @@ module Types
 import Prelude
 
 import Control.Monad.Except (except)
-import Data.Array (fromFoldable, many)
+import Data.Array (fromFoldable, many, snoc)
 import Data.Bifunctor (lmap)
 import Data.Either (hush)
-import Data.FoldableWithIndex (foldMapWithIndex)
+import Data.FoldableWithIndex (foldrWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.Int (fromString)
 import Data.List.Types (NonEmptyList(..))
 import Data.Map (Map, insert)
 import Data.Maybe (Maybe(..), maybe)
-import Data.Newtype (class Newtype, unwrap)
+import Data.Newtype (class Newtype)
 import Data.NonEmpty ((:|))
+import Data.String (joinWith)
 import Data.String.CodeUnits (fromCharArray)
 import Data.String.Read (class Read, read)
 import Data.Traversable (maximum, traverse)
@@ -153,11 +154,14 @@ instance decodeSearchJson :: Decode SearchJson where
         genericDecode defaultOptions { unwrapSingleConstructors = true }
 
 -- This object is only a simple new type used to isolate the pretty print logic for the dependencies
--- TODO: Find a better naming
 newtype NewerDependencyMap = NewerDependencyMap (Map String (Array Version))
 
 derive instance newtypeNewerDependencyMap :: Newtype NewerDependencyMap _
 
 instance showNewerDependencyMap :: Show NewerDependencyMap where
-    show =
-        foldMapWithIndex (\k -> maybe "" (\v -> k <> ": " <> show v <> "\n") <<< maximum) <<< unwrap
+    show (NewerDependencyMap dependencyMap) =
+        dependencyMap # foldrWithIndex format [] # joinWith "\n"
+        where
+            format :: String -> Array Version -> Array String -> Array String
+            format k =
+                flip snoc <<< (maybe "" ((<>) (k <> ": ") <<< show) <<< maximum)
