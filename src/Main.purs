@@ -30,7 +30,7 @@ import Types
     , DependencyMap(DependencyMap)
     , Entry
     , ElmJson(ElmJson)
-    , Packages(Packages)
+    , NewerDependencyMap(NewerDependencyMap)
     , SearchJson
     , Version
     )
@@ -45,7 +45,7 @@ main = runY defaultHelp $ app <$> projectPathArgument
                 getDepencencies projectPath
                     >>= (liftEffect
                         <<< logShow
-                        <<< Packages
+                        <<< NewerDependencyMap
                         <<< filterWithKey (const $ not <<< null)
                         <<< fromFoldable
                         <<< mapWithIndex (findLaterVersions jsonSearch))

@@ -3,7 +3,7 @@ module Types
     , DependencyMap(DependencyMap)
     , Entry
     , ElmJson(ElmJson)
-    , Packages(Packages)
+    , NewerDependencyMap(NewerDependencyMap)
     , SearchJson
     , Version(Version)
     ) where
@@ -54,7 +54,7 @@ versionParser =
             _ ->
                 fail "Version format is not valid"
 
-derive instance repGenericVersion :: Generic Version _
+derive instance genericVersion :: Generic Version _
 
 instance decodeVersion :: Decode Version where
     decode value =
@@ -96,9 +96,7 @@ instance ordVersion :: Ord Version where
 -- The elm.json dependencies and their version parsed
 newtype DependencyMap = DependencyMap (Map String (Maybe Version))
 
-derive instance repGenericObject :: Generic DependencyMap _
-
-derive newtype instance showDependencyMap :: Show DependencyMap
+derive instance genericObject :: Generic DependencyMap _
 
 instance decodeObject :: Decode DependencyMap where
     decode value =
@@ -112,9 +110,7 @@ newtype Dependencies = Dependencies
     { direct :: DependencyMap
     }
 
-derive instance repGenericDependencies :: Generic Dependencies _
-
-derive newtype instance showDependencies :: Show Dependencies
+derive instance genericDependencies :: Generic Dependencies _
 
 instance decodeDependencies :: Decode Dependencies where
     decode =
@@ -125,9 +121,7 @@ newtype ElmJson = ElmJson
     { dependencies :: Dependencies
     }
 
-derive instance repGenericElmJson :: Generic ElmJson _
-
-derive newtype instance showElmJson :: Show ElmJson
+derive instance genericElmJson :: Generic ElmJson _
 
 instance decodeElmJson :: Decode ElmJson where
     decode =
@@ -139,11 +133,9 @@ newtype Entry = Entry
     , versions :: Array Version
     }
 
-derive instance repGenericEntry :: Generic Entry _
+derive instance genericEntry :: Generic Entry _
 
 derive instance newtypeEntry :: Newtype Entry _
-
-derive newtype instance showEntry :: Show Entry
 
 instance decodeEntry :: Decode Entry where
     decode =
@@ -152,11 +144,9 @@ instance decodeEntry :: Decode Entry where
 -- The root object fetched from the elm package search json
 newtype SearchJson = SearchJson (Array Entry)
 
-derive instance repGenericSearchJson :: Generic SearchJson _
+derive instance genericSearchJson :: Generic SearchJson _
 
 derive instance newtypeSearchJson :: Newtype SearchJson _
-
-derive newtype instance showSearchJson :: Show SearchJson
 
 instance decodeSearchJson :: Decode SearchJson where
     decode =
@@ -164,11 +154,10 @@ instance decodeSearchJson :: Decode SearchJson where
 
 -- This object is only a simple new type used to isolate the pretty print logic for the dependencies
 -- TODO: Find a better naming
-newtype Packages = Packages (Map String (Array Version))
+newtype NewerDependencyMap = NewerDependencyMap (Map String (Array Version))
 
-derive instance newtypePackages :: Newtype Packages _
+derive instance newtypeNewerDependencyMap :: Newtype NewerDependencyMap _
 
-instance showPackages :: Show Packages where
-    show packages =
-        foldMapWithIndex (\k -> maybe "" (\v -> k <> ": " <> show v <> "\n") <<< maximum)
-            $ unwrap packages
+instance showNewerDependencyMap :: Show NewerDependencyMap where
+    show =
+        foldMapWithIndex (\k -> maybe "" (\v -> k <> ": " <> show v <> "\n") <<< maximum) <<< unwrap
