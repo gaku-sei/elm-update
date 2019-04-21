@@ -36,7 +36,7 @@ import Text.Parsing.Parser.Combinators (sepBy1)
 import Text.Parsing.Parser.String (string)
 import Text.Parsing.Parser.Token (digit)
 
--- The version object and its parser
+-- The version record and its parser
 -- Elm versions are always formatted like the following: major.minor.patch
 data Version = Version
     { major :: Int
@@ -76,8 +76,8 @@ instance readVersion :: Read Version where
 derive instance eqVersion :: Eq Version
 
 -- Since the `Ord` generic derivation is based on the alphabetical order,
--- it means that renaming patch, to let's say, bugfixes, will completely
--- change the ordering of Version. Hence, the manual instance.
+-- it means that renaming patch to, let's say, bugfixes, will completely
+-- change the ordering of Version. Hence the manual instance.
 instance ordVersion :: Ord Version where
     compare (Version { major }) (Version { major: major' })
         | major > major' = GT
@@ -128,7 +128,7 @@ instance decodeElmJson :: Decode ElmJson where
     decode =
         genericDecode defaultOptions { unwrapSingleConstructors = true }
 
--- The entry object fetched from the elm package search json
+-- The entry record fetched from the elm package search json
 newtype Entry = Entry
     { name :: String
     , versions :: Array Version
@@ -142,7 +142,7 @@ instance decodeEntry :: Decode Entry where
     decode =
         genericDecode defaultOptions { unwrapSingleConstructors = true }
 
--- The root object fetched from the elm package search json
+-- The root new type fetched from the elm package search json
 newtype SearchJson = SearchJson (Array Entry)
 
 derive instance genericSearchJson :: Generic SearchJson _
@@ -153,7 +153,7 @@ instance decodeSearchJson :: Decode SearchJson where
     decode =
         genericDecode defaultOptions { unwrapSingleConstructors = true }
 
--- This object is only a simple new type used to isolate the pretty print logic for the dependencies
+-- This new type is used to isolate the pretty print logic for the dependencies
 newtype NewerDependencyMap = NewerDependencyMap (Map String (Array Version))
 
 derive instance newtypeNewerDependencyMap :: Newtype NewerDependencyMap _
