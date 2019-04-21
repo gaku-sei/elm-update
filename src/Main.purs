@@ -2,11 +2,10 @@ module Main where
 
 import Prelude
 
-import Control.Monad.Except (runExcept)
+import Control.Monad.Except (catchError, runExcept)
 import Data.Array (filter, null)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), either)
-import Data.Foldable (fold)
 import Data.FunctorWithIndex (mapWithIndex)
 import Data.Map (Map, filterWithKey, fromFoldable, isEmpty)
 import Data.Maybe (Maybe(..))
@@ -18,12 +17,12 @@ import Effect.Aff (Aff, attempt, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
 import Effect.Console (logShow)
-import Effect.Exception (throw)
 import Foreign.Generic (defaultOptions, genericDecodeJSON)
 import Milkis (URL(..), defaultFetchOptions, fetch, text)
 import Milkis.Impl.Node (nodeFetch)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Aff (readTextFile)
+import Node.Process (exit)
 import Node.Yargs.Applicative (Y, runY, yarg)
 import Node.Yargs.Setup (defaultHelp)
 import Types (Dependencies(Dependencies), DependencyMap(DependencyMap), Entry, ElmJson(ElmJson), NewerDependencyMap(NewerDependencyMap), SearchJson, Version)
@@ -34,16 +33,18 @@ main = runY defaultHelp $ app <$> projectPathArgument
         app :: String -> Effect Unit
         app projectPath =
             launchAff_ do
+                dependencyMap <- getDepencencies projectPath
+
                 liftEffect $ log "Fetching latest dependencies versions..."
 
                 jsonSearch <- unwrap <$> fetchSearch
 
-                getDepencencies projectPath
-                    >>= (mapWithIndex (findLaterVersions jsonSearch)
+                dependencyMap
+                    # mapWithIndex (findLaterVersions jsonSearch)
                         >>> fromFoldable
                         >>> filterWithKey (const $ not <<< null)
                         >>> logNewerDependencyMap
-                        >>> liftEffect)
+                        >>> liftEffect
 
         logNewerDependencyMap :: Map String (Array Version) -> Effect Unit
         logNewerDependencyMap m =
@@ -73,13 +74,20 @@ main = runY defaultHelp $ app <$> projectPathArgument
         fetchSearch =
             (attempt $ (fetch nodeFetch) (URL "https://package.elm-lang.org/search.json") defaultFetchOptions)
                 >>= lmap (const unit) >>> traverse text
-                >>= either (const $ liftEffect $ throw "An error occured when fetching the dependencies db") pure
+                >>= either (const $ cleanExit "An error occured while fetching the dependencies db") pure
                     <<< ((=<<) (genericDecodeJSON defaultOptions { unwrapSingleConstructors = true } >>> runExcept >>> lmap (const unit)))
 
         getDepencencies :: String -> Aff (Map String (Maybe Version))
         getDepencencies projectPath = do
             readTextFile UTF8 projectPath
+                # (flip catchError $ const $ cleanExit ("Couldn't read file " <> projectPath))
                 >>= \content ->
-                    pure $ fold
+                    either
+                        (const $ cleanExit "The provided elm.json file is invalid")
+                        pure
                         $ (\(ElmJson { dependencies: Dependencies { direct: DependencyMap direct } }) -> direct)
-                        <$> runExcept (genericDecodeJSON defaultOptions { unwrapSingleConstructors = true } content)
+                            <$> runExcept (genericDecodeJSON defaultOptions { unwrapSingleConstructors = true } content)
+
+        cleanExit :: forall a. String -> Aff a
+        cleanExit =
+            (=<<) (const $ liftEffect $ exit 1) <<< log

@@ -1,6 +1,11 @@
 {
   "name": "elm-update",
-  "ignore": ["**/.*", "node_modules", "bower_components", "output"],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
   "dependencies": {
     "purescript-prelude": "^4.1.0",
     "purescript-console": "^4.2.0",
@@ -14,7 +19,8 @@
     "purescript-parsing": "^5.0.2",
     "purescript-debug": "^4.0.0",
     "purescript-nonempty": "^5.0.0",
-    "purescript-yargs": "^4.0.0"
+    "purescript-yargs": "^4.0.0",
+    "purescript-node-process": "^7.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0",
