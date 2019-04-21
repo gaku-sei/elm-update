@@ -1,4 +1,4 @@
-module Test.Version (tests) where
+module Test.Types (tests) where
 
 import Prelude
 
@@ -7,7 +7,7 @@ import Data.Identity (Identity)
 import Effect.Aff (Aff)
 import Test.Spec (Group, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Version (Version(..))
+import Types (Version(Version))
 
 buildVersion :: Int -> Int -> Int -> Version
 buildVersion major minor patch =
