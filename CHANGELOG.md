@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+## [0.1.2] - 2019-04-22
+
+### Added
+
+- Official release on NPM
+
+### Fixed
+
+- Proper version is displayed when typing `elm-udapte --version`
+
 ## [0.1.1] - 2019-04-21
 
 ### Changed
