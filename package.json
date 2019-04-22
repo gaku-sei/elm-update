@@ -19,7 +19,7 @@
     "postinstall": "bower install && pulp build"
   },
   "devDependencies": {
-    "pulp": "^12.4.0",
+    "pulp": "^12.4.2",
     "purescript-psa": "^0.7.3",
     "yarn": "^1.15.2"
   }
