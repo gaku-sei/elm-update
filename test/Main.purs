@@ -9,5 +9,5 @@ import Test.Types as Types
 
 main :: Effect Unit
 main =
-    run [consoleReporter] do
-        Types.tests
+  run [consoleReporter] do
+    Types.tests
