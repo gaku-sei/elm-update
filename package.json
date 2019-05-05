@@ -2,25 +2,26 @@
   "name": "elm-update",
   "version": "0.1.2",
   "main": "index.js",
+  "repository": "git@github.com:gaku-sei/elm-update.git",
+  "author": "Kevin COMBRIAT <japan.combriat.kevin@gmail.com>",
+  "license": "MIT",
   "bin": {
     "elm-update": "./bin/index.js"
   },
-  "repository": "git@github.com:gaku-sei/elm-upgrade.git",
-  "author": "Kevin COMBRIAT <japan.combriat.kevin@gmail.com>",
-  "license": "MIT",
+  "scripts": {
+    "start": "spago run",
+    "build": "spago build",
+    "test": "spago test",
+    "postinstall": "yarn build"
+  },
   "dependencies": {
-    "node-fetch": "^2.3.0",
+    "node-fetch": "^2.5.0",
     "yargs": "^13.2.2"
   },
-  "scripts": {
-    "start": "pulp run",
-    "build": "pulp build",
-    "test": "pulp test",
-    "postinstall": "bower install && pulp build"
-  },
   "devDependencies": {
-    "pulp": "^12.4.2",
+    "purescript": "^0.12.5",
     "purescript-psa": "^0.7.3",
+    "spago": "^0.7.7",
     "yarn": "^1.15.2"
   }
 }
