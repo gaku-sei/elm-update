@@ -1,24 +1,19 @@
 module Test.Types (tests) where
 
 import Prelude
-
-import Control.Monad.State (StateT)
-import Data.Identity (Identity)
-import Effect.Aff (Aff)
-import Test.Spec (Group, describe, it)
+import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Types (Version(Version))
 
 buildVersion :: Int -> Int -> Int -> Version
-buildVersion major minor patch =
-  Version { major, minor, patch }
+buildVersion major minor patch = Version { major, minor, patch }
 
-tests :: StateT (Array (Group (Aff Unit))) Identity Unit
+tests :: Spec Unit
 tests =
   describe "Version" do
     ord
 
-ord :: StateT (Array (Group (Aff Unit))) Identity Unit
+ord :: Spec Unit
 ord =
   describe "ordVersion" do
     it "properly compare versions" do

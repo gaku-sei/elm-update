@@ -1,7 +1,6 @@
 module Main where
 
 import Prelude
-
 import Data.Array (filter, null)
 import Data.Either (Either(Left))
 import Data.FunctorWithIndex (mapWithIndex)
@@ -19,35 +18,28 @@ import Node.Yargs.Setup (defaultHelp)
 import Types (Entry, Version)
 
 main :: Effect Unit
-main =
-  runY defaultHelp $ app <$> projectPathArgument
+main = runY defaultHelp $ app <$> projectPathArgument
   where
-    app :: String -> Effect Unit
-    app projectPath =
-      launchAff_ do
-        dependencyMap <- getDepencencies projectPath
+  app :: String -> Effect Unit
+  app projectPath =
+    launchAff_ do
+      dependencyMap <- getDepencencies projectPath
+      liftEffect $ log "Fetching latest dependencies versions..."
+      jsonSearch <- unwrap <$> fetchSearch
+      dependencyMap
+        # mapWithIndex (findLaterVersions jsonSearch)
+        >>> fromFoldable
+        >>> filterWithKey (const $ not <<< null)
+        >>> logNewerDependencyMap
+        >>> liftEffect
 
-        liftEffect $ log "Fetching latest dependencies versions..."
+  findLaterVersions :: Array Entry -> String -> (Maybe Version) -> Tuple String (Array Version)
+  findLaterVersions entries k v = Tuple k $ filter (Just >>> (<) v) allVersions
+    where
+    allVersions :: Array Version
+    allVersions = case filter (unwrap >>> _.name >>> (==) k) entries of
+      [ m ] -> unwrap m # _.versions
+      _ -> []
 
-        jsonSearch <- unwrap <$> fetchSearch
-
-        dependencyMap
-          # mapWithIndex (findLaterVersions jsonSearch)
-            >>> fromFoldable
-            >>> filterWithKey (const $ not <<< null)
-            >>> logNewerDependencyMap
-            >>> liftEffect
-
-    findLaterVersions :: Array Entry -> String -> (Maybe Version) -> Tuple String (Array Version)
-    findLaterVersions entries k v =
-      Tuple k $ filter (Just >>> (<) v) allVersions
-      where
-        allVersions :: Array Version
-        allVersions =
-          case filter (unwrap >>> _.name >>> (==) k) entries of
-            [m] -> unwrap m # _.versions
-            _ -> []
-
-    projectPathArgument :: Y String
-    projectPathArgument =
-      yarg "project" ["p"] (Just "elm.json path") (Left "./elm.json") true
+  projectPathArgument :: Y String
+  projectPathArgument = yarg "project" [ "p" ] (Just "elm.json path") (Left "./elm.json") true
