@@ -1,6 +1,6 @@
 {
   "name": "elm-update",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "index.js",
   "repository": "git@github.com:gaku-sei/elm-update.git",
   "author": "Kevin COMBRIAT <japan.combriat.kevin@gmail.com>",

@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.2.0] - 2019-09-08
+
+### Changed
+
+- Use [purty](https://gitlab.com/joneshf/purty) and [spago](https://github.com/spacchetti/spago)
+- Updated dependencies
+
 ## [0.1.2] - 2019-04-22
 
 ### Added
