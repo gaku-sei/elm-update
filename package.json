@@ -15,7 +15,7 @@
     "postinstall": "yarn build"
   },
   "dependencies": {
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "yargs": "^14.0.0"
   },
   "devDependencies": {
