@@ -1,3 +1,9 @@
+# Archived
+
+The remote json file got updated and unfortunately I don't have the time to update this repo :disappointed:
+
+But there is an other, better tool here: https://github.com/zwilias/elm-json :smile:
+
 ## Elm-update
 
 The `elm-update` command allows to list the updatable dependencies listed in an `elm.json` file.
