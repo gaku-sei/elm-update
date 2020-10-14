@@ -8,7 +8,4 @@ import Test.Spec.Runner (runSpec)
 import Test.Types as Types
 
 main :: Effect Unit
-main =
-  launchAff_
-    $ runSpec [ consoleReporter ] do
-        Types.tests
+main = launchAff_ $ runSpec [ consoleReporter ] Types.tests
