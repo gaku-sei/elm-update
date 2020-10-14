@@ -10,12 +10,7 @@ buildVersion major minor patch = Version { major, minor, patch }
 
 tests :: Spec Unit
 tests =
-  describe "Version" do
-    ord
-
-ord :: Spec Unit
-ord =
-  describe "ordVersion" do
+  describe "Version Ordering" do
     it "properly compare versions" do
       buildVersion 1 0 0 `compare` buildVersion 1 0 0 `shouldEqual` EQ
       buildVersion 0 0 0 `compare` buildVersion 0 0 0 `shouldEqual` EQ
